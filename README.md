@@ -1,0 +1,2 @@
+# gensynauto
+gnesyn auto2
