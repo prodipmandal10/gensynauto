@@ -1,6 +1,6 @@
 #!/bin/bash
 
-USER_HOME=$(eval echo ~$USER)
+USER_HOME=$(eval echo ~$(whoami))
 SWARM_PATH="$USER_HOME/rl-swarm/modal-login"
 BACKUP_PATH="$USER_HOME/rl-swarm/backup"
 
@@ -30,7 +30,6 @@ while true; do
 
     2)
       echo "👀 Starting GEN session watcher..."
-      # Start piping GEN tmux session logs to file (only once)
       tmux pipe-pane -t GEN -o "cat >> /tmp/genlog.txt"
       tail -Fn0 /tmp/genlog.txt | while read line; do
 
