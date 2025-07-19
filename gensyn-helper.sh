@@ -9,7 +9,7 @@ mkdir -p "$BACKUP_PATH"
 while true; do
   clear
   echo -e "\033[1;36m🌟 Gensyn Crash & Recovery Helper Menu:\033[0m"
-  echo "1️⃣  Backup temp-data"
+  echo "1️⃣  Backup temp-data folder"
   echo "2️⃣  Start GEN watcher (auto respond + restore)"
   echo "3️⃣  Exit"
   echo -n "👉 Enter your choice [1-3]: "
@@ -17,18 +17,20 @@ while true; do
 
   case $choice in
     1)
-      echo "📦 Creating backup of temp-data..."
-      if [ -f "$SWARM_PATH/temp-data" ]; then
-        cp "$SWARM_PATH/temp-data" "$BACKUP_PATH/temp-data"
+      echo "📦 Creating backup of temp-data folder..."
+      if [ -d "$SWARM_PATH/temp-data" ]; then
+        rm -rf "$BACKUP_PATH/temp-data"
+        cp -r "$SWARM_PATH/temp-data" "$BACKUP_PATH/temp-data"
         echo "✅ Backup saved at $BACKUP_PATH/temp-data"
       else
-        echo "❌ temp-data not found in $SWARM_PATH"
+        echo "❌ temp-data folder not found in $SWARM_PATH"
       fi
       read -p "Press Enter to continue..."
       ;;
 
     2)
       echo "👀 Starting GEN session watcher..."
+      # Start piping GEN tmux session logs to file (only once)
       tmux pipe-pane -t GEN -o "cat >> /tmp/genlog.txt"
       tail -Fn0 /tmp/genlog.txt | while read line; do
 
@@ -43,12 +45,13 @@ while true; do
         fi
 
         if [[ "$line" == *"wait for logging"* || "$line" == *"failed to logging"* ]]; then
-          if [[ -f "$BACKUP_PATH/temp-data" ]]; then
-            echo "♻️ Restoring temp-data from backup..."
-            cp "$BACKUP_PATH/temp-data" "$SWARM_PATH/temp-data"
-            echo "✅ temp-data restored to $SWARM_PATH"
+          if [[ -d "$BACKUP_PATH/temp-data" ]]; then
+            echo "♻️ Restoring temp-data folder from backup..."
+            rm -rf "$SWARM_PATH/temp-data"
+            cp -r "$BACKUP_PATH/temp-data" "$SWARM_PATH/temp-data"
+            echo "✅ temp-data folder restored!"
           else
-            echo "⚠️ Backup temp-data file not found!"
+            echo "⚠️ Backup temp-data folder not found!"
           fi
         fi
 
